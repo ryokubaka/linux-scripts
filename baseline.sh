@@ -1,13 +1,15 @@
 #!/bin/bash
 
-if [[ "$1" = 0 ]]; then
+if [[ -z "$1" ]]; then
 	echo "Please specify the IP address of your aggregator box"
 	exit 1
 fi
 
-if [ ! -d "results" ]; then
-	mkdir results
+if [[ ! -d "/tmp/results" ]]; then
+	mkdir /tmp/results
 fi
+
+cd /tmp/
 
 while read host; do
 	echo "======== Header ==========" > results/baseline_$host
@@ -56,7 +58,7 @@ while read host; do
 
 	echo "========== Contents of /etc/cron.* ==========" >> results/baseline_$host
 	for file in /etc/cron.d/*; do
-		echo "========================================================================" >> baseline_$host
+		echo "========================================================================" >> results/baseline_$host
 		ls -la $file >> results/baseline_$host
 		cat $file >> results/baseline_$host
 	done
@@ -78,5 +80,5 @@ while read host; do
 
 done < ips.txt
 
-ssh admin@$1 'mkdir /tmp/results'
+ssh admin@$1 "mkdir /tmp/results"
 scp results/* admin@$1:/tmp/results/
